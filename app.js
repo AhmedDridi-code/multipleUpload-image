@@ -1,16 +1,18 @@
 //Upload Image test Application
 /***** GLOBAL IMPORTS *****/
 const express = require('express');
+
 const app = express();
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const multer = require("multer");
-app.use("/uploads", express.static('c:/Users/Iserv/Documents/GitHub/multipleUpload-image-app/uploads/'));
+require('dotenv').config();
+app.use("/uploads", express.static(process.env.UPLOAD_FILE_PATH));
 const storage = multer.diskStorage({
-    //configure the path of the destination of the upload images
+    //configure path of the destination of the upload images
     destination: function (req, file, cb) {
-        cb(null, "c:/Users/Iserv/Documents/GitHub/multipleUpload-image-app/uploads/");
+        cb(null, process.env.UPLOAD_FILE_PATH);
     },
     filename: function (req, file, cb) {
         //configure the name of the images
@@ -70,8 +72,8 @@ app.post("/image", multipleUpload, (req, res) => {
     //const { logo, img } = req.files;
 
     //preparing Image Link to put it in mongo Database
-    const imageLink = "http://localhost:8080/uploads/" + req.files.image[0].filename;
-    const logoLink = "http://localhost:8080/uploads/" + req.files.logo[0].filename;
+    const imageLink = process.env.URL+"uploads/" + req.files.image[0].filename;
+    const logoLink = process.env.URL+"uploads/" + req.files.logo[0].filename;
 
     console.log("image : " + imageLink);
     console.log("logo : " + logoLink);
@@ -81,8 +83,6 @@ app.post("/image", multipleUpload, (req, res) => {
         name: req.body.name,
         logo: logoLink,
         image: imageLink,
-
-
     });
     //Saving the image object to database
     image.save().then(result => {
